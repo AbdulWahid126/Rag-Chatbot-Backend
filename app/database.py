@@ -33,7 +33,7 @@ class Conversation(Base):
 def init_db():
     """Initialize database tables"""
     Base.metadata.create_all(bind=engine)
-    print("✅ Database tables created successfully")
+    print("[SUCCESS] Database tables created successfully")
 
 
 def get_db():

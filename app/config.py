@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str
     GEMINI_BASE_URL: str = "https://generativelanguage.googleapis.com/v1beta/openai/"
     EMBEDDING_MODEL: str = "text-embedding-004"  # Gemini embedding model
-    CHAT_MODEL: str = "gemini-1.5-flash"
+    CHAT_MODEL: str = "gemini-1.0-pro"  # Use available model for OpenAI compatibility
     MAX_TOKENS: int = 500
     TEMPERATURE: float = 0.7
     

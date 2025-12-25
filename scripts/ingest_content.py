@@ -51,47 +51,47 @@ def extract_metadata_from_path(file_path: str) -> dict:
 
 def ingest_book_content():
     """Read all MDX files and ingest into Qdrant"""
-    print("🚀 Starting content ingestion...")
-    
+    print("[INFO] Starting content ingestion...")
+
     # Initialize vector store
     vector_store = VectorStore()
-    
-    # Create collection
-    print("📦 Creating Qdrant collection...")
-    vector_store.create_collection(vector_size=768)  # Gemini text-embedding-004 size
 
-    
+    # Create collection
+    print("[INFO] Creating Qdrant collection...")
+    vector_store.create_collection(vector_size=1536)  # Gemini text-embedding-004 size
+
+
     # Find all MDX files
     docs_path = Path(__file__).parent.parent.parent / "docs"
     mdx_files = list(docs_path.glob("**/*.mdx"))
-    
-    print(f"📚 Found {len(mdx_files)} MDX files")
-    
+
+    print(f"[INFO] Found {len(mdx_files)} MDX files")
+
     total_chunks = 0
-    
+
     for file_path in mdx_files:
-        print(f"\n📄 Processing: {file_path.name}")
-        
+        print(f"\n[INFO] Processing: {file_path.name}")
+
         try:
             # Read file
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
+
             # Extract metadata
             metadata_base = extract_metadata_from_path(str(file_path))
-            
+
             # Chunk content
             chunks = chunk_markdown(content, chunk_size=settings.CHUNK_SIZE)
-            print(f"   ✂️  Created {len(chunks)} chunks")
-            
+            print(f"   [INFO] Created {len(chunks)} chunks")
+
             if not chunks:
-                print(f"   ⚠️  No chunks created, skipping")
+                print(f"   [WARNING] No chunks created, skipping")
                 continue
-            
+
             # Generate embeddings using OpenAI SDK (Gemini endpoint)
-            print(f"   🔢 Generating embeddings...")
+            print(f"   [INFO] Generating embeddings...")
             embeddings = []
-            
+
             for chunk in chunks:
                 cleaned_chunk = clean_text(chunk)
                 response = client.embeddings.create(
@@ -99,27 +99,27 @@ def ingest_book_content():
                     input=cleaned_chunk
                 )
                 embeddings.append(response.data[0].embedding)
-            
+
             # Create metadata for each chunk
             metadata = [metadata_base.copy() for _ in chunks]
-            
+
             # Upsert to Qdrant
-            print(f"   💾 Uploading to Qdrant...")
+            print(f"   [INFO] Uploading to Qdrant...")
             count = vector_store.upsert_chunks(chunks, embeddings, metadata)
             total_chunks += count
-            
-            print(f"   ✅ Successfully ingested {count} chunks")
-            
+
+            print(f"   [SUCCESS] Successfully ingested {count} chunks")
+
         except Exception as e:
-            print(f"   ❌ Error processing {file_path.name}: {e}")
+            print(f"   [ERROR] Error processing {file_path.name}: {e}")
             continue
-    
-    print(f"\n🎉 Ingestion complete!")
-    print(f"📊 Total chunks ingested: {total_chunks}")
-    
+
+    print(f"\n[SUCCESS] Ingestion complete!")
+    print(f"[INFO] Total chunks ingested: {total_chunks}")
+
     # Show collection info
     info = vector_store.collection_info()
-    print(f"📈 Collection info: {info}")
+    print(f"[INFO] Collection info: {info}")
 
 
 if __name__ == "__main__":

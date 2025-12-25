@@ -18,6 +18,6 @@ load_dotenv()
 
 
 if __name__ == "__main__":
-    print("🗄️  Initializing database...")
+    print("[INFO] Initializing database...")
     init_db()
-    print("✅ Database initialization complete!")
+    print("[SUCCESS] Database initialization complete!")

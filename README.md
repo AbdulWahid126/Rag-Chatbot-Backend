@@ -91,17 +91,27 @@ GET /api/chat/test
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-
-1. Install Vercel CLI: `npm i -g vercel`
-2. Run: `vercel`
-3. Follow prompts
-
-### Railway
+### Railway (Recommended)
 
 1. Connect GitHub repository
-2. Add environment variables
+2. Add environment variables:
+   - `GEMINI_API_KEY`: Your Gemini API key
+   - `QDRANT_URL`: Your Qdrant cluster URL (format: https://your-cluster-id.europe-west3-0.gcp.cloud.qdrant.io:6333)
+   - `QDRANT_API_KEY`: Your Qdrant API key
+   - `DATABASE_URL`: Your Neon Postgres connection string
 3. Deploy
+
+### Manual Deployment
+
+For production deployment, make sure to update the QDRANT_URL in your environment variables to match your Qdrant Cloud instance. The URL should include the proper port (6333) and use HTTPS.
+
+Example format: `https://your-cluster-id.europe-west3-0.gcp.cloud.qdrant.io:6333`
+
+⚠️ **Important**: Before deploying, ensure you have ingested your content by running:
+
+```bash
+python scripts/ingest_content.py
+```
 
 ## 📁 Project Structure
 

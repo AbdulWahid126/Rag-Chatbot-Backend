@@ -25,9 +25,9 @@ class VectorStore:
                     distance=Distance.COSINE
                 )
             )
-            print(f"✅ Collection '{self.collection_name}' created successfully")
+            print(f"[SUCCESS] Collection '{self.collection_name}' created successfully")
         except Exception as e:
-            print(f"Collection might already exist: {e}")
+            print(f"[WARNING] Collection might already exist: {e}")
     
     def upsert_chunks(self, chunks: List[str], embeddings: List[List[float]], metadata: List[Dict]):
         """Store text chunks with embeddings"""
@@ -53,15 +53,15 @@ class VectorStore:
         return len(points)
     
     def search(
-        self, 
-        query_vector: List[float], 
+        self,
+        query_vector: List[float],
         limit: int = 5,
         module_filter: Optional[str] = None,
         chapter_filter: Optional[str] = None
     ):
         """Search for relevant chunks with optional filters"""
         search_filter = None
-        
+
         # Build filters if provided
         if module_filter or chapter_filter:
             conditions = []
@@ -74,24 +74,27 @@ class VectorStore:
                     FieldCondition(key="chapter", match=MatchValue(value=chapter_filter))
                 )
             search_filter = Filter(must=conditions)
-        
-        results = self.client.search(
+
+        results = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
+            query=query_vector,
             limit=limit,
             query_filter=search_filter
         )
-        
-        return results
+
+        return results.points
     
     def collection_info(self):
         """Get collection information"""
         try:
             info = self.client.get_collection(self.collection_name)
+            # Handle different Qdrant client versions
+            vectors_count = getattr(info, 'vectors_count', getattr(info, 'indexed_vectors_count', 'unknown'))
+            points_count = getattr(info, 'points_count', getattr(info, 'indexed_points_count', 'unknown'))
             return {
                 "name": self.collection_name,
-                "vectors_count": info.vectors_count,
-                "points_count": info.points_count
+                "vectors_count": vectors_count,
+                "points_count": points_count
             }
         except Exception as e:
             return {"error": str(e)}

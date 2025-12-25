@@ -56,7 +56,7 @@ class RAGEngine:
         # Extract context and sources
         context_chunks = []
         sources = []
-        
+
         for result in results:
             context_chunks.append(result.payload["text"])
             sources.append({
